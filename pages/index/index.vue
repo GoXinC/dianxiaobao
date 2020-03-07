@@ -18,18 +18,21 @@
 			<view class="notice-content">电销助手V1.0版将上线试运营啦！</view>
 			<view>></view>
 		</view>
-		<view class="region01">
+		<view class="region">
 			<view class="region-title">通话专区</view>
 			<view class="region-content">
-				<view class="region-content-block">
-					<view>批量导入客户</view>
-					<view>导入所有客户信息</view>
+				<view class="region-content-block block-left">
+					<view class="block-title">批量导入客户</view>
+					<view class="block-describe">导入所有客户信息</view>
 				</view>
-				<view class="region-content-block">
-					<view>客户管理</view>
-					<view>添加/修改客户资料</view>
+				<view class="region-content-block block-right">
+					<view class="block-title">客户管理</view>
+					<view class="block-describe">添加/修改客户资料</view>
 				</view>
 			</view>
+		</view>
+		<view class="region">
+			<view class="region-title">最近联系人</view>
 		</view>
 	</view>
 </template>
@@ -114,7 +117,7 @@
 		width: 100%;
 		height: 300rpx;
 		position: relative;
-		background-color: rgb(0, 218, 183);
+		background-image: linear-gradient(to bottom right, rgb(0, 223, 166), rgb(0, 211, 205));;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -147,7 +150,7 @@
 	}
 	.neck{
 		width: 100%;
-		margin: 40rpx;
+		margin-top: 50rpx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -164,30 +167,55 @@
 	.notice{
 		width: 100%;
 		display: flex;
-		margin: 30rpx;
+		margin-top: 30rpx;
 		align-items: center;
 		justify-content: space-between;
 	}
 	.notice-title{
+		text-overline-color: #555555;
+		text-underline-color: #007AFF;
 		font-weight: 400;
 		color: rgb(0, 218, 183);
 		border-bottom: 3px solid rgb(169, 233, 229);
 	}
-	.region01{
+	.region{
 		width: 100%;
 		height: 200rpx;
+		margin-top: 30rpx;
 	}
 	.region-title{
 		border-left: 3px solid rgb(0, 218, 183);
 		padding-left: 20rpx;
+		margin-bottom: 20rpx;
 	}
 	.region-content{
 		width: inherit;
-		height: inherit;
+		height: 145rpx;
 		display: flex;
 	}
 	.region-content-block{
 		width: 50%;
 		height: inherit;
+		border-radius: 10rpx;
+		box-sizing:border-box;
+		padding-top: 30rpx;
+		padding-left: 20rpx;
+	}
+	.block-title{
+		font-weight: bold;
+		font-size: 30rpx;
+		color: rgb(0, 214, 204);
+		margin-bottom: 15rpx;
+	}
+	.block-describe{
+		font-size: 25rpx;
+	}
+	.block-left{
+		margin-right: 5px;
+		background-color: rgb(226, 241, 232);
+	}
+	.block-right{
+		margin-left: 5px;
+		background-color: rgb(208, 246, 247);
 	}
 </style>
