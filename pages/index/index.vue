@@ -6,7 +6,7 @@
 			<button class="call-button" @click="call">立即拨打</button>
 		</view>
 		<view class="neck">
-			<block v-for="item in neck">
+			<block v-for="(item,index) in neck" :key="index">
 				<view class="neck-item content" @click="item.url">
 					<image class="neck-img" mode="widthFix" :src="item.img"></image>
 					<view class="neck-name">{{item.name}}</view>
@@ -34,14 +34,13 @@
 		<view class="region">
 			<view class="region-title">最近联系人</view>
 		</view>
+		<statistics msg="hello"></statistics>
 	</view>
 </template>
 
 <script>
-	
 	const recorderManager = uni.getRecorderManager();
 	const innerAudioContext = uni.createInnerAudioContext();
-	
 	innerAudioContext.autoplay = true;
 	export default {
 		data() {
@@ -100,11 +99,14 @@
 					innerAudioContext.play();
 				}
 			}
+		},
+		components:{
 		}
+		
 	}
 </script>
 
-<style>
+<style scoped lang="scss">
 	.content {
 		display: flex;
 		flex-direction: column;
@@ -112,110 +114,113 @@
 		justify-content: center;
 		padding: 20rpx;
 		font-size: 30rpx;
-	}
-	.head{
-		width: 100%;
-		height: 300rpx;
-		position: relative;
-		background-image: linear-gradient(to bottom right, rgb(0, 223, 166), rgb(0, 211, 205));;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		border-radius: 10rpx;
-	}
-	.input-phone{
-		height: 20rpx;
-		width: 60%;
-		text-align: center;
-		color: white;
-		font-size: 60rpx;
-		font-weight: 500;
-		border-bottom: 2px solid white;
-	}
-	.call-number{
-		font-size: 20rpx;
-		color: white;
-	}
-	.call-button{
-		position: absolute;
-		bottom: -25px;
-		height: 50px;
-		background-color: white;
-		color: rgb(0, 218, 183);
-		box-shadow: 1px 1px 2px rgb(0, 218, 183);
-		font-weight: bold;
-		border-radius: 100px;
-		width: 50%;
-	}
-	.neck{
-		width: 100%;
-		margin-top: 50rpx;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.neck-item{
-		width: 33%;
-	}
-	.neck-img{
-		width:30%;
-	}
-	.neck-name{
-		font-size: 30rpx;
-	}
-	.notice{
-		width: 100%;
-		display: flex;
-		margin-top: 30rpx;
-		align-items: center;
-		justify-content: space-between;
-	}
-	.notice-title{
-		text-overline-color: #555555;
-		text-underline-color: #007AFF;
-		font-weight: 400;
-		color: rgb(0, 218, 183);
-		border-bottom: 3px solid rgb(169, 233, 229);
-	}
-	.region{
-		width: 100%;
-		height: 200rpx;
-		margin-top: 30rpx;
-	}
-	.region-title{
-		border-left: 3px solid rgb(0, 218, 183);
-		padding-left: 20rpx;
-		margin-bottom: 20rpx;
-	}
-	.region-content{
-		width: inherit;
-		height: 145rpx;
-		display: flex;
-	}
-	.region-content-block{
-		width: 50%;
-		height: inherit;
-		border-radius: 10rpx;
-		box-sizing:border-box;
-		padding-top: 30rpx;
-		padding-left: 20rpx;
-	}
-	.block-title{
-		font-weight: bold;
-		font-size: 30rpx;
-		color: rgb(0, 214, 204);
-		margin-bottom: 15rpx;
-	}
-	.block-describe{
-		font-size: 25rpx;
-	}
-	.block-left{
-		margin-right: 5px;
-		background-color: rgb(226, 241, 232);
-	}
-	.block-right{
-		margin-left: 5px;
-		background-color: rgb(208, 246, 247);
+		.head{
+			width: 100%;
+			height: 300rpx;
+			position: relative;
+			background-image: linear-gradient(to bottom right, rgb(0, 223, 166), rgb(0, 211, 205));;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			border-radius: 10rpx;
+			.input-phone{
+				height: 20rpx;
+				width: 60%;
+				text-align: center;
+				color: white;
+				font-size: 60rpx;
+				font-weight: 500;
+				border-bottom: 2px solid white;
+			}
+			.call-number{
+				font-size: 20rpx;
+				color: white;
+			}
+			.call-button{
+				position: absolute;
+				bottom: -25px;
+				height: 50px;
+				background-color: white;
+				color: rgb(0, 218, 183);
+				box-shadow: 1px 1px 2px rgb(0, 218, 183);
+				font-weight: bold;
+				border-radius: 100px;
+				width: 50%;
+			}
+		}
+		.neck{
+			width: 100%;
+			margin-top: 50rpx;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			.neck-item{
+				width: 33%;
+				.neck-img{
+					width:30%;
+				}
+				.neck-name{
+					font-size: 30rpx;
+				}
+			}
+		}
+		.notice{
+			width: 100%;
+			display: flex;
+			margin-top: 30rpx;
+			align-items: center;
+			justify-content: space-between;
+			.notice-title{
+				text-overline-color: #555555;
+				text-underline-color: #007AFF;
+				font-weight: 400;
+				color: rgb(0, 218, 183);
+				border-bottom: 3px solid rgb(169, 233, 229);
+			}
+			.notice-content{
+				font-size: 25rpx;
+			}
+		}
+		.region{
+			width: 100%;
+			height: 200rpx;
+			margin-top: 30rpx;
+			.region-title{
+				border-left: 3px solid rgb(0, 218, 183);
+				padding-left: 20rpx;
+				margin-bottom: 20rpx;
+			}
+			.region-content{
+				width: inherit;
+				height: 145rpx;
+				display: flex;
+				.region-content-block{
+					width: 50%;
+					height: inherit;
+					border-radius: 10rpx;
+					box-sizing:border-box;
+					padding-top: 30rpx;
+					padding-left: 20rpx;
+					.block-title{
+						font-weight: bold;
+						font-size: 30rpx;
+						color: rgb(0, 214, 204);
+						margin-bottom: 15rpx;
+					}
+					.block-describe{
+						font-size: 25rpx;
+					}
+				}
+				.block-left{
+					margin-right: 5px;
+					background-color: rgb(226, 241, 232);
+				}
+				.block-right{
+					margin-left: 5px;
+					background-color: rgb(208, 246, 247);
+				}
+			}
+		}
 	}
 </style>
