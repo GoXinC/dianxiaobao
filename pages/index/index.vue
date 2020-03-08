@@ -16,7 +16,7 @@
 		<view class="notice">
 			<view class="notice-title">最新公告</view>
 			<view class="notice-content">电销助手V1.0版将上线试运营啦！</view>
-			<view>></view>
+			<view><uni-icons type="arrowright" size="15"></uni-icons></view>
 		</view>
 		<view class="region">
 			<view class="region-title">通话专区</view>
@@ -33,12 +33,17 @@
 		</view>
 		<view class="region">
 			<view class="region-title">最近联系人</view>
+			<view class="region-tag">
+				<uni-tag text="三天内" type="error" inverted="false" size="small" circle="true"></uni-tag>
+				<uni-tag text="意向客户" inverted="false" size="small" circle="true"></uni-tag>
+			</view>
 		</view>
-		<statistics msg="hello"></statistics>
 	</view>
 </template>
 
 <script>
+	import uniIcons from "@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue";
+	import uniTag from "@dcloudio/uni-ui/lib/uni-tag/uni-tag.vue";
 	const recorderManager = uni.getRecorderManager();
 	const innerAudioContext = uni.createInnerAudioContext();
 	innerAudioContext.autoplay = true;
@@ -101,6 +106,8 @@
 			}
 		},
 		components:{
+			uniIcons,
+			uniTag
 		}
 		
 	}
@@ -118,7 +125,7 @@
 			width: 100%;
 			height: 300rpx;
 			position: relative;
-			background-image: linear-gradient(to bottom right, rgb(0, 223, 166), rgb(0, 211, 205));;
+			background-image: linear-gradient(to bottom right, $uni-theme-board-left, $uni-theme-board-right);
 			display: flex;
 			flex-direction: column;
 			align-items: center;
@@ -142,8 +149,8 @@
 				bottom: -25px;
 				height: 50px;
 				background-color: white;
-				color: rgb(0, 218, 183);
-				box-shadow: 1px 1px 2px rgb(0, 218, 183);
+				color: $uni-theme-color;
+				box-shadow: 1px 1px 2px $uni-theme-color;
 				font-weight: bold;
 				border-radius: 100px;
 				width: 50%;
@@ -172,11 +179,9 @@
 			align-items: center;
 			justify-content: space-between;
 			.notice-title{
-				text-overline-color: #555555;
-				text-underline-color: #007AFF;
 				font-weight: 400;
-				color: rgb(0, 218, 183);
-				border-bottom: 3px solid rgb(169, 233, 229);
+				color: $uni-theme-color;
+				border-bottom: 3px solid $uni-theme-tint-color;
 			}
 			.notice-content{
 				font-size: 25rpx;
@@ -187,7 +192,7 @@
 			height: 200rpx;
 			margin-top: 30rpx;
 			.region-title{
-				border-left: 3px solid rgb(0, 218, 183);
+				border-left: 3px solid $uni-theme-color;
 				padding-left: 20rpx;
 				margin-bottom: 20rpx;
 			}
@@ -205,7 +210,7 @@
 					.block-title{
 						font-weight: bold;
 						font-size: 30rpx;
-						color: rgb(0, 214, 204);
+						color: $uni-theme-color;
 						margin-bottom: 15rpx;
 					}
 					.block-describe{
@@ -214,12 +219,15 @@
 				}
 				.block-left{
 					margin-right: 5px;
-					background-color: rgb(226, 241, 232);
+					background-color: $uni-theme-thin-color;
 				}
 				.block-right{
 					margin-left: 5px;
-					background-color: rgb(208, 246, 247);
+					background-color: $uni-theme-tint-color;
 				}
+			}
+			.region-tag{
+				display: flex;
 			}
 		}
 	}
