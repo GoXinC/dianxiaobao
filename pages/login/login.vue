@@ -43,13 +43,13 @@
 							}
 						})
 						// 跳转首页
-						uni.redirectTo({
+						uni.switchTab({
 							url:"/pages/index/index"
 						})
 					}else{
 						uni.showToast({
 						    title: '登录失败',
-						    duration: 2000
+						    duration: 1000
 						});
 					}
 				})
@@ -74,7 +74,7 @@
 			margin-top: 60rpx;
 			.input-box{
 				position: relative;
-				border-bottom: 3rpx solid $uni-theme-color;
+				border-bottom: 3rpx solid $dxb-theme-color;
 				padding-left: 30rpx;
 				.icon{
 					position: absolute;
@@ -89,7 +89,7 @@
 				width: 300rpx;
 				height: 80rpx;
 				margin-top: 80rpx;
-				font-size: $uni-font-size-base;
+				font-size: $dxb-text-m;
 				background-color: #00aaff;
 				color: #ffffff;
 			}

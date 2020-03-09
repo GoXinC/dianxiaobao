@@ -10,7 +10,7 @@
 				<view class="neck-item content" @click="item.url">
 					<image class="neck-img" mode="widthFix" :src="item.img"></image>
 					<view class="neck-name">{{item.name}}</view>
-				</view>
+				</view> 
 			</block>
 		</view>
 		<view class="notice">
@@ -34,8 +34,9 @@
 		<view class="region">
 			<view class="region-title">最近联系人</view>
 			<view class="region-tag">
-				<uni-tag text="三天内" type="error" inverted="false" size="small" circle="true"></uni-tag>
-				<uni-tag text="意向客户" inverted="false" size="small" circle="true"></uni-tag>
+				<view class="tag-list" v-for="(item,index) in tagList" :key="index" >
+					<uni-tag :text="item.content" type="primary" :inverted="item.check" size="small" circle="true"></uni-tag>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -44,6 +45,7 @@
 <script>
 	import uniIcons from "@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue";
 	import uniTag from "@dcloudio/uni-ui/lib/uni-tag/uni-tag.vue";
+	import andriod from "../../servier/android.js";
 	const recorderManager = uni.getRecorderManager();
 	const innerAudioContext = uni.createInnerAudioContext();
 	innerAudioContext.autoplay = true;
@@ -56,19 +58,34 @@
 				neck:[{
 					img:'/static/statis.png',
 					name:'数据统计',
-					url:this.startRecord
+					url:this.getCallLog
 				},{
 					img:'/static/record.png',
 					name:'通话记录',
-					url:this.endRecord
+					url:this.getContacts
 				},{
 					img:'/static/call.png',
 					name:'快速拨号',
 					url:this.playVoice
-				},]
+				}] ,
+				tagList:[{
+					content:"三天内",
+					check:false
+				},{
+					content:"意向客户",
+					check:true
+				}]
 			}
 		},
 		onLoad() {
+			var userInfo = uni.getStorageSync("userInfo");
+			if(userInfo){
+				
+			}else{
+				uni.redirectTo({
+					url:"../login/login"
+				})
+			}
 			let self = this;
 			recorderManager.onStop(function (res) {
 			    console.log('recorder stop' + JSON.stringify(res));
@@ -77,17 +94,18 @@
 		},
 		methods: {
 			call() {
-                // 获取主Activity对象的实例  
-                var main = plus.android.runtimeMainActivity();  
-				// 导入Activity、Intent类
-                var Intent = plus.android.importClass("android.content.Intent");  
-                var Uri = plus.android.importClass("android.net.Uri");  
-                // 创建Intent  
-                var uri = Uri.parse("tel:"+this.phone); // 这里可修改电话号码  
-                var call = new Intent("android.intent.action.CALL",uri);  
-                // 调用startActivity方法拨打电话  
-                main.startActivity( call );
-				this.startRecord();
+				andriod.callPhone();
+			},
+			getCallLog(){
+				var logLength = andriod.callLog();
+				uni.showToast({
+				    title: "logSize:" + logLength,
+				    duration: 1000
+				});
+			},
+			getContacts(){
+				var clientList = andriod.getContacts()
+				console.log(JSON.stringify(clientList));
 			},
 			startRecord() {
 				console.log('开始录音');
@@ -125,7 +143,7 @@
 			width: 100%;
 			height: 300rpx;
 			position: relative;
-			background-image: linear-gradient(to bottom right, $uni-theme-board-left, $uni-theme-board-right);
+			background-image: linear-gradient(to bottom right, $dxb-theme-board-left, $dxb-theme-board-right);
 			display: flex;
 			flex-direction: column;
 			align-items: center;
@@ -141,7 +159,7 @@
 				border-bottom: 2px solid white;
 			}
 			.call-number{
-				font-size: 20rpx;
+				font-size: $dxb-text-xs;
 				color: white;
 			}
 			.call-button{
@@ -149,8 +167,8 @@
 				bottom: -25px;
 				height: 50px;
 				background-color: white;
-				color: $uni-theme-color;
-				box-shadow: 1px 1px 2px $uni-theme-color;
+				color: $dxb-theme-color;
+				box-shadow: 1px 1px 2px $dxb-theme-color;
 				font-weight: bold;
 				border-radius: 100px;
 				width: 50%;
@@ -168,7 +186,7 @@
 					width:30%;
 				}
 				.neck-name{
-					font-size: 30rpx;
+					font-size: $dxb-text-m;
 				}
 			}
 		}
@@ -180,11 +198,12 @@
 			justify-content: space-between;
 			.notice-title{
 				font-weight: 400;
-				color: $uni-theme-color;
-				border-bottom: 3px solid $uni-theme-tint-color;
+				color: $dxb-theme-color;
+				font-size: $dxb-text-m;
+				border-bottom: 3px solid $dxb-theme-tint-color;
 			}
 			.notice-content{
-				font-size: 25rpx;
+				font-size: $dxb-text-s;
 			}
 		}
 		.region{
@@ -192,7 +211,7 @@
 			height: 200rpx;
 			margin-top: 30rpx;
 			.region-title{
-				border-left: 3px solid $uni-theme-color;
+				border-left: 3px solid $dxb-theme-color;
 				padding-left: 20rpx;
 				margin-bottom: 20rpx;
 			}
@@ -209,25 +228,29 @@
 					padding-left: 20rpx;
 					.block-title{
 						font-weight: bold;
-						font-size: 30rpx;
-						color: $uni-theme-color;
+						font-size: $dxb-text-m;
+						color: $dxb-theme-color;
 						margin-bottom: 15rpx;
 					}
 					.block-describe{
-						font-size: 25rpx;
+						font-size: $dxb-text-s;
 					}
 				}
 				.block-left{
 					margin-right: 5px;
-					background-color: $uni-theme-thin-color;
+					background-color: $dxb-theme-thin-color;
 				}
 				.block-right{
 					margin-left: 5px;
-					background-color: $uni-theme-tint-color;
+					background-color: $dxb-theme-tint-color;
 				}
 			}
 			.region-tag{
 				display: flex;
+				font-size: $dxb-text-xs;
+				.tag-list{
+					margin: 3rpx;
+				}
 			}
 		}
 	}

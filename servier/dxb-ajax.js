@@ -23,6 +23,7 @@ var request = function(url,method,data){
 		})
 	})
 }
+// 获取身份验证信息
 var validation = function(){
 	userId = uni.getStorageSync("userId");
 	token = uni.getStorageSync("token");
