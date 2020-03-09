@@ -17,6 +17,25 @@ export default {
 	    main.startActivity( call );
 		this.startRecord();
 	},
+	//监听用户通话状态
+	Receiver(){
+		console.log("000")
+		var main = plus.android.runtimeMainActivity(); //获取activity
+		var receiver = plus.android.implements('io.dcloud.feature.internal.reflect.BroadcastReceiver', {
+			onReceive: function(context, intent) { //实现onReceiver回调函数
+				plus.android.importClass(intent);
+				console.log(intent.getAction());
+				result.textContent += '\nAction :' + intent.getAction();
+				main.unregisterReceiver(receiver);
+			}
+		});
+		var IntentFilter = plus.android.importClass('android.content.IntentFilter');
+		var Intent = plus.android.importClass('android.content.Intent');
+		var filter = new IntentFilter();
+		filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED); //监听飞行模式
+		console.log("111")
+		main.registerReceiver(receiver, filter); //注册监听
+	},
 	//获取通话记录
 	callLog:function(){
 		// plus.android.requestPermissions(['android.permission.READ_CALL_LOG', 'android.permission.WRITE_CALL_LOG', 'android.permission.CALL_PHONE']

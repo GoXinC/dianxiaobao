@@ -66,7 +66,7 @@
 				},{
 					img:'/static/call.png',
 					name:'快速拨号',
-					url:this.playVoice
+					url:this.broadcast
 				}] ,
 				tagList:[{
 					content:"三天内",
@@ -103,9 +103,14 @@
 				    duration: 1000
 				});
 			},
+			//获取通讯录
 			getContacts(){
 				var clientList = andriod.getContacts()
 				console.log(JSON.stringify(clientList));
+			},
+			//广播监听通话
+			broadcast(){
+				andriod.Receiver();
 			},
 			startRecord() {
 				console.log('开始录音');
