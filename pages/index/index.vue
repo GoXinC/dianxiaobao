@@ -45,13 +45,15 @@
 <script>
 	import uniIcons from "@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue";
 	import uniTag from "@dcloudio/uni-ui/lib/uni-tag/uni-tag.vue";
-	import andriod from "../../servier/android.js";
-	const recorderManager = uni.getRecorderManager();
-	const innerAudioContext = uni.createInnerAudioContext();
-	innerAudioContext.autoplay = true;
+	import android from "../../servier/android.js";
+	const recorderManager = uni.getRecorderManager(); //录音管理对象
+	const innerAudioContext = uni.createInnerAudioContext(); //录音播放上下文
+	innerAudioContext.autoplay = true; //是否播放录音
 	export default {
 		data() {
 			return {
+				recorderManager: android.recorderManager(),
+				innerAudioContext:android.innerAudioContext(),
 				title: 'Hello',
 				number: '',
 				phone:'',
@@ -66,7 +68,7 @@
 				},{
 					img:'/static/call.png',
 					name:'快速拨号',
-					url:this.broadcast
+					url:this.playVoice
 				}] ,
 				tagList:[{
 					content:"三天内",
@@ -74,7 +76,8 @@
 				},{
 					content:"意向客户",
 					check:true
-				}]
+				}],
+				voicePath:''
 			}
 		},
 		onLoad() {
@@ -86,18 +89,23 @@
 					url:"../login/login"
 				})
 			}
-			let self = this;
-			recorderManager.onStop(function (res) {
-			    console.log('recorder stop' + JSON.stringify(res));
-			    self.voicePath = res.tempFilePath;
-			});
+			
 		},
 		methods: {
+			//拨号
 			call() {
-				andriod.callPhone();
+				android.callPhone(this.phone); //拨号
+				this.recorderManager.start(); //录音
+				android.hangUp(); //监听用户挂断
+				let self = this;
+				this.recorderManager.onStop(function (res) {
+					console.log('recorder stop' + JSON.stringify(res));
+					self.voicePath = res.tempFilePath;
+				});
 			},
+			//获取通话记录
 			getCallLog(){
-				var logLength = andriod.callLog();
+				var logLength = android.callLog();
 				uni.showToast({
 				    title: "logSize:" + logLength,
 				    duration: 1000
@@ -105,27 +113,31 @@
 			},
 			//获取通讯录
 			getContacts(){
-				var clientList = andriod.getContacts()
+				var clientList = android.getContacts()
 				console.log(JSON.stringify(clientList));
 			},
-			//广播监听通话
-			broadcast(){
-				andriod.Receiver();
-			},
-			startRecord() {
-				console.log('开始录音');
-				recorderManager.start();
-			},
-			endRecord() {
-				console.log('录音结束');
-				recorderManager.stop();
-			},
 			playVoice() {
-				console.log('播放录音');
+				console.log('播放录音' + this.voicePath);
 				if (this.voicePath) {
-					innerAudioContext.src = this.voicePath;
-					innerAudioContext.play();
+					this.innerAudioContext.src = this.voicePath;
+					this.innerAudioContext.play();
 				}
+			},
+			startRecord:function() {
+			    recorderManager.start();
+			    console.log('开始录音');
+			},
+			pauseRecord:function() {
+			    recorderManager.pause();
+			    console.log('暂停录音');
+			},
+			resumeRecord:function() {
+			    console.log('继续录音');
+			    recorderManager.resume();
+			},
+			endRecord:function() {
+			    recorderManager.stop();
+			    console.log('录音结束');
 			}
 		},
 		components:{

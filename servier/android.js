@@ -1,12 +1,22 @@
-const recorderManager = uni.getRecorderManager();
-const innerAudioContext = uni.createInnerAudioContext();
-innerAudioContext.autoplay = true;
+const recorderManager = uni.getRecorderManager(); //录音管理对象
+const innerAudioContext = uni.createInnerAudioContext(); //录音播放上下文
+innerAudioContext.autoplay = true; //是否播放录音
+const main = plus.android.runtimeMainActivity();
 
+import API from "./dxb-ajax.js"
 export default {
-	//拨号并录音
+	recorderManager:function(){
+		return uni.getRecorderManager();
+	},
+	innerAudioContext:function(){
+		const innerAudioContext = uni.createInnerAudioContext(); //录音播放上下文
+		innerAudioContext.autoplay = true; //是否播放录音
+		return innerAudioContext
+	},
+	// 拨号
 	callPhone:function(phone) {
-		// 获取主Activity对象的实例  
-		const main = plus.android.runtimeMainActivity();  
+		// 获取主Activity对象的实例 
+		// const main = plus.android.runtimeMainActivity();  
 		// 导入Activity、Intent类
 	    var Intent = plus.android.importClass("android.content.Intent");  
 	    var Uri = plus.android.importClass("android.net.Uri");  
@@ -15,26 +25,77 @@ export default {
 	    var call = new Intent("android.intent.action.CALL",uri);  
 	    // 调用startActivity方法拨打电话  
 	    main.startActivity( call );
-		this.startRecord();
 	},
-	//监听用户通话状态
-	Receiver(){
+	//监听用户电话拨出状态
+	dialOut:function(){
 		console.log("000")
-		var main = plus.android.runtimeMainActivity(); //获取activity
+		// var main = plus.android.runtimeMainActivity(); //获取activity
 		var receiver = plus.android.implements('io.dcloud.feature.internal.reflect.BroadcastReceiver', {
 			onReceive: function(context, intent) { //实现onReceiver回调函数
 				plus.android.importClass(intent);
 				console.log(intent.getAction());
 				result.textContent += '\nAction :' + intent.getAction();
-				main.unregisterReceiver(receiver);
+				main.unregisterReceiver(receiver);//注销广播
 			}
 		});
 		var IntentFilter = plus.android.importClass('android.content.IntentFilter');
 		var Intent = plus.android.importClass('android.content.Intent');
 		var filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED); //监听飞行模式
+		filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED); //监听电话是否拨出
 		console.log("111")
 		main.registerReceiver(receiver, filter); //注册监听
+	},
+	//监听用户挂断电话状态
+	hangUp:function(){
+		var _t = this;
+			// #ifdef APP-PLUS
+		try{
+			if(uni.getSystemInfoSync().platform == 'android'){      //Android
+		
+			// var main = plus.android.runtimeMainActivity();  
+			var Context = plus.android.importClass("android.content.Context");  
+			var telephonyManager = plus.android.importClass("android.telephony.TelephonyManager");  
+			var telephonyManager=plus.android.runtimeMainActivity().getSystemService(Context.TELEPHONY_SERVICE);  
+			var receiver=plus.android.implements('io.dcloud.android.content.BroadcastReceiver', {  
+					onReceive: function(context, intent) { 
+						 plus.android.importClass(intent);  
+						 console.log(intent.getAction());  
+						var telephonyManager = plus.android.importClass("android.telephony.TelephonyManager");  
+						var telephonyManager=plus.android.runtimeMainActivity().getSystemService(Context.TELEPHONY_SERVICE);  
+						var phonetype=telephonyManager.getCallState();  
+						var phoneNumber = intent.getStringExtra(telephonyManager.EXTRA_INCOMING_NUMBER);  
+						console.log("phonetype:"+phonetype);  //电话状态 0->空闲状态  1->振铃状态  2->通话存在  
+						console.log("phoneNumber:"+phoneNumber);  //电话号
+						if(phonetype == 0){
+							_t.endRecord();
+							main.unregisterReceiver(receiver);
+						}
+						// _t.state.push({state:phonetype == 0?'空闲状态':phonetype == 1?'振铃状态':'通话存在', time:dateFormat('hh:mm:ss')})
+						
+					}  
+					});  
+			var IntentFilter = plus.android.importClass('android.content.IntentFilter');  
+			var filter = new IntentFilter();  
+			filter.addAction(telephonyManager.ACTION_PHONE_STATE_CHANGED);   
+			main.registerReceiver(receiver, filter);  
+		
+			}else if(uni.getSystemInfoSync().platform == 'ios'){              //ios
+				var callstatus=false
+				var CTCall = plus.ios.importClass('CTCall');  
+				var CTCallCenter = plus.ios.importClass('CTCallCenter');  
+				var center = new CTCallCenter();  
+				center.init()  
+				center.setCallEventHandler(function(){  
+				    console.log('空闲状态->',callstatus)   
+					
+					callstatus=!callstatus
+					_t.state.push({state:callstatus?'存在通话':'空闲状态',time:dateFormat('hh:mm:ss')})
+					console.log(_t.state)
+				})
+			}
+			
+		}catch(err){console.log(err)}
+			// #endif
 	},
 	//获取通话记录
 	callLog:function(){
@@ -85,19 +146,19 @@ export default {
 		})
 	},
 	startRecord:function() {
-	    console.log('开始录音');
 	    recorderManager.start();
+	    console.log('开始录音');
 	},
 	pauseRecord:function() {
-	    console.log('暂停录音');
 	    recorderManager.pause();
+	    console.log('暂停录音');
 	},
 	resumeRecord:function() {
 	    console.log('继续录音');
 	    recorderManager.resume();
 	},
 	endRecord:function() {
-	    console.log('录音结束');
 	    recorderManager.stop();
+	    console.log('录音结束');
 	},
 }

@@ -6,7 +6,7 @@
 
 <script>
 	import uniIndexedList from "@dcloudio/uni-ui/lib/uni-indexed-list/uni-indexed-list.vue";
-	import andriod from "../../servier/android.js";
+	import android from "../../servier/android.js";
 	import cnchar from 'cnchar';
 	export default {
 		data(){
@@ -23,7 +23,7 @@
 				console.log(JSON.stringify(e))
 			},
 			async sortList(){
-				var clientList = await andriod.getContacts()
+				var clientList = await android.getContacts()
 				var templist = [{
 					"letter": "A",
 					"data": []
@@ -110,7 +110,14 @@
 					var name = clientList[i].displayName
 					var initial = cnchar.spell(name)[0]
 					var index = initial.charCodeAt()-65
-					templist[index].data.push(name);
+					if(templist[index]){
+						templist[index].data.push(name);
+					}else{
+						templist[index]={
+							"letter": initial,
+							"data": []
+						}
+					}
 					// console.log(JSON.stringify(templist[index]))
 				}
 				this.list = templist

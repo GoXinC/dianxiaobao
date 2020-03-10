@@ -23,6 +23,19 @@ var request = function(url,method,data){
 		})
 	})
 }
+var uploadFile = function(url,filePath,fileName,formData){
+	var _url = API_URL + url;
+	uni.uploadFile({
+		url:_url,
+		filePath:filePath,
+		name:fileName,
+		formData:formData,
+		success:function(res){
+			console.log(res);
+		}
+		
+	})
+}
 // 获取身份验证信息
 var validation = function(){
 	userId = uni.getStorageSync("userId");
@@ -54,6 +67,9 @@ export default {
 				}
 			})
 		})
+	},
+	insertionCallLog(){
+		// uploadFile()
 	}
 	
 }
