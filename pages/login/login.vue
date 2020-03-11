@@ -38,7 +38,7 @@
 						uni.setStorage({
 							key:'userInfo',
 							data:{
-								userId:res.userId,
+								userId:res.userId + '',
 								token:res.token
 							}
 						})

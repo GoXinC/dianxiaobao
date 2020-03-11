@@ -7,7 +7,7 @@
 		</view>
 		<view class="neck">
 			<block v-for="(item,index) in neck" :key="index">
-				<view class="neck-item content" @click="item.url">
+				<view class="neck-item content" @click="neckRoute(item.url)">
 					<image class="neck-img" mode="widthFix" :src="item.img"></image>
 					<view class="neck-name">{{item.name}}</view>
 				</view> 
@@ -21,11 +21,11 @@
 		<view class="region">
 			<view class="region-title">通话专区</view>
 			<view class="region-content">
-				<view class="region-content-block block-left">
+				<view class="region-content-block block-left" @click="imports">
 					<view class="block-title">批量导入客户</view>
 					<view class="block-describe">导入所有客户信息</view>
 				</view>
-				<view class="region-content-block block-right">
+				<view class="region-content-block block-right" @click="addCustomer">
 					<view class="block-title">客户管理</view>
 					<view class="block-describe">添加/修改客户资料</view>
 				</view>
@@ -46,29 +46,26 @@
 	import uniIcons from "@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue";
 	import uniTag from "@dcloudio/uni-ui/lib/uni-tag/uni-tag.vue";
 	import android from "../../servier/android.js";
-	const recorderManager = uni.getRecorderManager(); //录音管理对象
-	const innerAudioContext = uni.createInnerAudioContext(); //录音播放上下文
-	innerAudioContext.autoplay = true; //是否播放录音
+	import API from "../../servier/dxb-ajax.js";
+	import {nesgame,formatTime} from "../../utils/utils.js";
 	export default {
 		data() {
 			return {
-				recorderManager: android.recorderManager(),
-				innerAudioContext:android.innerAudioContext(),
 				title: 'Hello',
 				number: '',
 				phone:'',
 				neck:[{
 					img:'/static/statis.png',
 					name:'数据统计',
-					url:this.getCallLog
+					url:''
 				},{
 					img:'/static/record.png',
 					name:'通话记录',
-					url:this.getContacts
+					url:'./callLog'
 				},{
 					img:'/static/call.png',
 					name:'快速拨号',
-					url:this.playVoice
+					url:''
 				}] ,
 				tagList:[{
 					content:"三天内",
@@ -77,13 +74,37 @@
 					content:"意向客户",
 					check:true
 				}],
-				voicePath:''
+				voicePath:'',
+				callStartTime:'',
+				callEndTime:''
 			}
 		},
 		onLoad() {
 			var userInfo = uni.getStorageSync("userInfo");
 			if(userInfo){
-				
+				console.log(JSON.stringify(userInfo));
+				let self = this;
+				//录音结束回调
+				android.recorderManager.onStop(function (res) {
+					console.log('recorder stop' + JSON.stringify(res));
+					self.voicePath = res.tempFilePath;//录音临时文件地址
+					var userId = uni.getStorageSync("userInfo").userId;//获取用户Id
+					self.getClientId().then(function(data){//获取客户Id
+						var clientId = data==-1 ? '' : data+'' //如果手机号不是用户的传入空值
+						console.log(clientId);
+						var data = {
+							phone: self.phone,
+							clientId: clientId,
+							state: '1',
+							userId: userId,
+							duration: '20',
+							callStartTime:self.callStartTime,
+							callEndTime:self,callEndTime
+						}
+						//插入通话记录
+						API.insertionCallLog(res.tempFilePath,data)
+					}); 
+				});
 			}else{
 				uni.redirectTo({
 					url:"../login/login"
@@ -94,14 +115,15 @@
 		methods: {
 			//拨号
 			call() {
+				android.dialOut(this.dialOutBack);//监听电话是否拨出
 				android.callPhone(this.phone); //拨号
-				this.recorderManager.start(); //录音
-				android.hangUp(); //监听用户挂断
-				let self = this;
-				this.recorderManager.onStop(function (res) {
-					console.log('recorder stop' + JSON.stringify(res));
-					self.voicePath = res.tempFilePath;
-				});
+				// android.startRecord()//录音
+				// android.endRecord()
+			},
+			//电话拨出回调
+			dialOutBack(){
+				this.startRecord();
+				android.hangUp(this.endRecord); //监听用户挂断
 			},
 			//获取通话记录
 			getCallLog(){
@@ -111,10 +133,9 @@
 				    duration: 1000
 				});
 			},
-			//获取通讯录
+			//获取客户Id
 			getContacts(){
-				var clientList = android.getContacts()
-				console.log(JSON.stringify(clientList));
+				
 			},
 			playVoice() {
 				console.log('播放录音' + this.voicePath);
@@ -123,21 +144,37 @@
 					this.innerAudioContext.play();
 				}
 			},
+			async getClientId(){
+				var clientList = await API.getClient();
+				console.log(JSON.stringify(this.phone));
+				console.log(JSON.stringify(clientList));
+				for(let i = 0; i < clientList.length; i++){
+				    if(nesgame(clientList[i].customerPhone) == nesgame(this.phone)){
+						console.log(JSON.stringify(clientList[i]));
+						return clientList[i].id;
+					}
+				}
+				return -1;
+			},
+			// 颈部路由
+			neckRoute(url){
+				uni.navigateTo({
+					url:url
+				})
+			},
 			startRecord:function() {
-			    recorderManager.start();
-			    console.log('开始录音');
+				this.callStartTime = formatTime(new Date());
+			    android.startRecord()
 			},
 			pauseRecord:function() {
-			    recorderManager.pause();
-			    console.log('暂停录音');
+			    android.pauseRecord();
 			},
 			resumeRecord:function() {
-			    console.log('继续录音');
-			    recorderManager.resume();
+			    android.resumeRecord();
 			},
 			endRecord:function() {
-			    recorderManager.stop();
-			    console.log('录音结束');
+				this.callEndTime = formatTime(new Date());
+				android.endRecord();
 			}
 		},
 		components:{
