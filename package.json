@@ -4,6 +4,8 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
+    "@dcloudio/uni-ui": "^1.1.8",
+    "async-validator": "^3.2.4",
     "cnchar": "^2.0.9"
   },
   "devDependencies": {},

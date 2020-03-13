@@ -3,11 +3,13 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "电销助手"
+				"navigationBarTitleText": "电销助手",
+				"enablePullDownRefresh": true,
+				"backgroundTextStyle": "light"
 			}
 		},{
 			"path": "pages/address/index",
-			"style": {
+			"style": {	
 				"navigationBarTitleText": "通讯录"
 			}
 		},{
@@ -29,11 +31,30 @@
 				// "navigationBarTextStyle":"black"
 			}
 		},{
+            "path" : "pages/index/speedDial",
+			"style": {
+				"navigationBarTitleText": "快速拨号"
+			}
+        },{
             "path" : "pages/index/callLog",
-            "style" : {}
+			"style": {
+				"navigationBarTitleText": "通话记录"
+			}
+        },{
+            "path" : "pages/index/prefecture/addClient",
+			"style": {
+				"navigationBarTitleText": "修改客户"
+			}
+        },{
+            "path" : "pages/index/prefecture/BatchImport",
+			"style": {
+				"navigationBarTitleText": "导入客户"
+			}
         },{
             "path" : "pages/statistics/statistics",
-            "style" : {}
+			"style": {
+				"navigationBarTitleText": "统计"
+			}
         }
     ],
 	"globalStyle": {

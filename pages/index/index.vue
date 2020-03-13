@@ -21,14 +21,14 @@
 		<view class="region">
 			<view class="region-title">通话专区</view>
 			<view class="region-content">
-				<view class="region-content-block block-left" @click="imports">
+				<navigator class="region-content-block block-left" url="prefecture/BatchImport">
 					<view class="block-title">批量导入客户</view>
 					<view class="block-describe">导入所有客户信息</view>
-				</view>
-				<view class="region-content-block block-right" @click="addCustomer">
+				</navigator>
+				<navigator class="region-content-block block-right" url="prefecture/addClient">
 					<view class="block-title">客户管理</view>
 					<view class="block-describe">添加/修改客户资料</view>
-				</view>
+				</navigator>
 			</view>
 		</view>
 		<view class="region">
@@ -38,6 +38,9 @@
 					<uni-tag :text="item.content" type="primary" :inverted="item.check" size="small" circle="true"></uni-tag>
 				</view>
 			</view>
+			<block v-for="(item,index) in callLog">
+				<tel :callLogList="item"></tel>
+			</block>
 		</view>
 	</view>
 </template>
@@ -47,7 +50,8 @@
 	import uniTag from "@dcloudio/uni-ui/lib/uni-tag/uni-tag.vue";
 	import android from "../../servier/android.js";
 	import API from "../../servier/dxb-ajax.js";
-	import {nesgame,formatTime} from "../../utils/utils.js";
+	import tel from "../../components/list-item/tel-list.vue";
+	import {formatTime,nesgame} from "../../utils/utils.js";
 	export default {
 		data() {
 			return {
@@ -65,7 +69,7 @@
 				},{
 					img:'/static/call.png',
 					name:'快速拨号',
-					url:''
+					url:'./speedDial'
 				}] ,
 				tagList:[{
 					content:"三天内",
@@ -74,6 +78,7 @@
 					content:"意向客户",
 					check:true
 				}],
+				callLog:[],
 				voicePath:'',
 				callStartTime:'',
 				callEndTime:''
@@ -84,6 +89,12 @@
 			if(userInfo){
 				console.log(JSON.stringify(userInfo));
 				let self = this;
+				self.getStatistics().then(function(res){
+					self.number = res ;
+				})
+				self.getCallLog().then(function(res){
+					self.callLog  = res ;
+				})
 				//录音结束回调
 				android.recorderManager.onStop(function (res) {
 					console.log('recorder stop' + JSON.stringify(res));
@@ -91,15 +102,12 @@
 					var userId = uni.getStorageSync("userInfo").userId;//获取用户Id
 					self.getClientId().then(function(data){//获取客户Id
 						var clientId = data==-1 ? '' : data+'' //如果手机号不是用户的传入空值
-						console.log(clientId);
 						var data = {
 							phone: self.phone,
 							clientId: clientId,
 							state: '1',
 							userId: userId,
-							duration: '20',
-							callStartTime:self.callStartTime,
-							callEndTime:self,callEndTime
+							duration: '20'
 						}
 						//插入通话记录
 						API.insertionCallLog(res.tempFilePath,data)
@@ -117,8 +125,6 @@
 			call() {
 				android.dialOut(this.dialOutBack);//监听电话是否拨出
 				android.callPhone(this.phone); //拨号
-				// android.startRecord()//录音
-				// android.endRecord()
 			},
 			//电话拨出回调
 			dialOutBack(){
@@ -126,16 +132,19 @@
 				android.hangUp(this.endRecord); //监听用户挂断
 			},
 			//获取通话记录
-			getCallLog(){
-				var logLength = android.callLog();
-				uni.showToast({
-				    title: "logSize:" + logLength,
-				    duration: 1000
-				});
+			async getCallLog(){
+				var logLength = await API.getCalls(1,5);
+				return logLength.list
 			},
-			//获取客户Id
-			getContacts(){
-				
+			async getStatistics(){
+				var List = await API.getStatistics(7);
+				var number = 0;
+				List.forEach(item =>{
+					if(item.callNumber){
+						number += item.callNumber
+					}
+				})
+				return number;
 			},
 			playVoice() {
 				console.log('播放录音' + this.voicePath);
@@ -144,6 +153,7 @@
 					this.innerAudioContext.play();
 				}
 			},
+			//根据手机号获取客户id
 			async getClientId(){
 				var clientList = await API.getClient();
 				console.log(JSON.stringify(this.phone));
@@ -158,12 +168,13 @@
 			},
 			// 颈部路由
 			neckRoute(url){
+				console.log(url)
 				uni.navigateTo({
 					url:url
 				})
 			},
 			startRecord:function() {
-				this.callStartTime = formatTime(new Date());
+				// this.callStartTime = formatTime(new Date());
 			    android.startRecord()
 			},
 			pauseRecord:function() {
@@ -173,13 +184,14 @@
 			    android.resumeRecord();
 			},
 			endRecord:function() {
-				this.callEndTime = formatTime(new Date());
+				// this.callEndTime = formatTime(new Date());
 				android.endRecord();
 			}
 		},
 		components:{
 			uniIcons,
-			uniTag
+			uniTag,
+			tel
 		}
 		
 	}
@@ -292,11 +304,11 @@
 				}
 				.block-left{
 					margin-right: 5px;
-					background-color: $dxb-theme-thin-color;
+					background-color: #ebfdff;//$dxb-theme-thin-color;
 				}
 				.block-right{
 					margin-left: 5px;
-					background-color: $dxb-theme-tint-color;
+					background-color: #eafcf0;//$dxb-theme-tint-color;
 				}
 			}
 			.region-tag{

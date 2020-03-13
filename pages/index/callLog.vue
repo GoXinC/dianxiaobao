@@ -1,9 +1,9 @@
 <template>
 	<view class="content">
 		<view>123</view>
-		<!-- <block v-for="(item,index) in callLogList" :key="index">
-			<view>{{item.clientName}}</view>
-		</block> -->
+		<block v-for="(item,index) in callLogList" :key="index">
+			<view>{{item.phone}}</view>
+		</block>
 		<view>456</view>
 	</view>
 </template>
@@ -18,10 +18,10 @@
 		},
 		onLoad(){
 			// this.getCalls(this.callLogList);
+			var self = this
 			API.getCalls().then(function(res){
-				console.log("122")
-				console.log(JSON.stringify(res));
-				this.callLogList = res;
+				console.log(JSON.stringify(res).length);
+				self.callLogList = res;
 			});
 		},
 		methods: {

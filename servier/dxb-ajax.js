@@ -4,6 +4,7 @@ var userId = "";
 var token = "";
 var request = function(url,method,data){
 	var _url = API_URL + url;
+	// console.log(JSON.stringify(data))
 	return new Promise(function(resolve, reject){
 		var userInfo = validation();
 		var userId = userInfo.userId + '';
@@ -18,9 +19,11 @@ var request = function(url,method,data){
 			},
 			data:data,
 			success: (res) => {
+				// console.log(JSON.stringify(res))
 				resolve(res.data)
 			},
 			fail: (error) => {
+				console.log(JSON.stringify(error))
 				reject(error)
 			}
 		})
@@ -43,7 +46,10 @@ var uploadFile = function(url,filePath,fileName,formData){
 		name:fileName,
 		formData:formData,
 		success:function(res){
-			console.log(res);
+			console.log(JSON.stringify(res));
+		},
+		fail:function(err){
+			console.log(JSON.stringify(err))
 		}
 		
 	})
@@ -61,6 +67,9 @@ var downloadFile = function(url){
 		},
 		success:function(res){
 			console.log(JSON.stringify(res));
+		},
+		fail:function(err){
+			console.log(JSON.stringify(err));
 		}
 	})
 }
@@ -79,17 +88,17 @@ export default {
 		return new Promise(function(resolve, reject){
 			uni.request({
 				url:_url,
-				method:"post",
+				method:"POST",
 				header: {
 					'Content-Type': 'application/x-www-form-urlencoded',
 				},
 				data:data,
 				success: (res) => {
-					console.log(JSON.stringify(res))
+					// console.log(JSON.stringify(res))
 					resolve(res.data)
 				},
 				fail: (error) => {
-					console.log(JSON.stringify(error))
+					// console.log(JSON.stringify(error))
 					reject(error)
 				}
 			})
@@ -101,10 +110,18 @@ export default {
 	},
 	//获取客户信息
 	getClient(){
-		return request("/client/getUserClients","get",{userId: validation().userId});
+		return request("/client/getUserClients","GET",{userId: validation().userId + ''});
 	},
 	//获取用户所有通话记录
-	getCalls(){
-		return request("/call/getCalls/" + validation().userId,"get",{})
-	}
+	getCalls(pageIndex,pageSize){
+		return request("/call/getCalls/" + validation().userId + "/" + pageIndex + "/" + pageSize,"GET",{})
+	},
+	//获取用户的统计数据
+	getStatistics(fate){
+		return request("/statistics/getData/" + validation().userId + "/" + fate,"GET",{})
+	},
+	//获取用户与单个客户的通话记录
+	getCallList(data){
+		return request("/call/getListCall","GET",data)
+	},
 }

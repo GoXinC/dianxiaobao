@@ -1,7 +1,7 @@
 const recorderManager = uni.getRecorderManager(); //录音管理对象
 const innerAudioContext = uni.createInnerAudioContext(); //录音播放上下文
 innerAudioContext.autoplay = true; //是否播放录音
-// const main = plus.android.runtimeMainActivity();
+const main = plus.android.runtimeMainActivity();
 
 import API from "./dxb-ajax.js"
 export default {
